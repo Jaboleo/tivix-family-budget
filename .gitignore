@@ -131,3 +131,5 @@ dmypy.json
 # Linting and testing scripts
 run_*.sh
 .pylintrc
+
+.vscode

@@ -17,28 +17,26 @@ def user_payload():
 
 
 @pytest.fixture()
-def create_user(admin_user):
+def create_user():
     """Create a user to use later in tests"""
     payload = {
         "username": "fixture_user1",
         "email": "fixture@test.com",
         "password": "123456"
     }
-    client.force_authenticate(admin_user)
     client.post("/users/", data=payload)
 
     yield User.objects.get(username__exact=payload['username'])
 
 
 @pytest.fixture()
-def create_user_2(admin_user):
+def create_user_2():
     """Create a user to use later in tests"""
     payload = {
         "username": "fixture_user2",
         "email": "fixture2@test.com",
         "password": "123456"
     }
-    client.force_authenticate(admin_user)
     client.post("/users/", data=payload)
 
     yield User.objects.get(username__exact=payload['username'])

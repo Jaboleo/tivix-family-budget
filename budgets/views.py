@@ -21,7 +21,6 @@ class BudgetViewSet(viewsets.ModelViewSet):
             return (IsAuthenticated(),)
         if self.action in ["destroy", "update", "partial_update"]:
             return (
-                IsAuthenticated(),
                 IsOwnerOrAdmin(),
             )
         else:
@@ -54,10 +53,10 @@ class ShareBudget(generics.ListCreateAPIView):
         data = request.data
         budget = get_object_or_404(Budget, pk=data["budget"])
         if budget.owner != request.user:
-            Response("Cannot share other users' budgets", status=status.HTTP_403_FORBIDDEN)
+            return Response("Cannot share other users' budgets", status=status.HTTP_403_FORBIDDEN)
         user = get_object_or_404(User, username=data["user"])
         if user == budget.owner:
-            Response("Cannot share with yourself", status=status.HTTP_403_FORBIDDEN)
+            return Response("Cannot share with yourself", status=status.HTTP_403_FORBIDDEN)
 
         budget.shared_with.add(user)
         return Response(f"Budget shared with user {user.username}", status=status.HTTP_200_OK)
@@ -72,11 +71,11 @@ class UnShareBudget(generics.ListCreateAPIView):
     def patch(self, request, format=None):
         data = request.data
         budget = get_object_or_404(Budget, pk=data["budget"])
-        if budget.owner != request.user or request.user not in budget.shared_with:
-            Response("Cannot unshare others from other users' budgets", status=status.HTTP_403_FORBIDDEN)
+        if request.user not in [*budget.shared_with.all(), budget.owner]:
+            return Response("Cannot unshare others from other users' budgets", status=status.HTTP_403_FORBIDDEN)
         user = get_object_or_404(User, username=data["user"])
         if user == budget.owner:
-            Response("Cannot unshare with yourself", status=status.HTTP_403_FORBIDDEN)
+            return Response("Cannot unshare with yourself", status=status.HTTP_403_FORBIDDEN)
 
         budget.shared_with.remove(user)
         return Response(f"Budget shared with user {user.username}", status=status.HTTP_200_OK)
@@ -100,7 +99,7 @@ class RecordViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == "create":
             return (IsAuthenticated(),)
-        if self.action in ["destroy", "update", "partial_update"]:
+        if self.action in ["update", "partial_update", "details_view"]:
             return (
                 IsAuthenticated(),
                 IsOwnerOrAdmin(),
@@ -122,3 +121,11 @@ class RecordViewSet(viewsets.ModelViewSet):
             return Response(record_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(record_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk):
+        record = get_object_or_404(Record, pk=pk)
+        budget = record.budget
+        if request.user == budget.owner or request.user.is_staff:
+            record.delete()
+            return Response(f"Record {pk} deleted", status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_403_FORBIDDEN)

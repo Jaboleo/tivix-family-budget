@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     # custom apps
-    "users"
+    "users",
+    "budgets"
 ]
 
 MIDDLEWARE = [
@@ -138,6 +139,10 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'import.path.to.urls.api_info',
 }
+
+# SIMPLE_JWT {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+# }
 
 APPEND_SLASH = True
 

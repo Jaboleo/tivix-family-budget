@@ -10,6 +10,7 @@ class IsOwnerOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user or request.user.is_staff is True
 
+
 class IsThisUserOrAdmin(permissions.BasePermission):
     """
     Object-level permission to only allow authors of an object and admins to edit it.

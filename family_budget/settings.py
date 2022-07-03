@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     # custom apps
-    "users"
+    "users",
+    "budgets"
 ]
 
 MIDDLEWARE = [
@@ -139,6 +140,10 @@ SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'import.path.to.urls.api_info',
 }
 
+# SIMPLE_JWT {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+# }
+
 APPEND_SLASH = True
 
 JWT_AUTH = {
@@ -156,9 +161,6 @@ JWT_AUTH_COOKIE = 'auth'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'

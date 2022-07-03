@@ -18,13 +18,14 @@ class BudgetSerializer(serializers.ModelSerializer):
 
     owner = UserSerializer(read_only=True)
     shared_with = UserSerializer(many=True, read_only=True, required=False)
+    date_created = serializers.DateTimeField(read_only=True)
     balance = serializers.SerializerMethodField(read_only=True)
     incomes = serializers.SerializerMethodField(read_only=True)
     expenses = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Budget
-        fields = ("id", "name", "owner", "balance", "incomes", "expenses", "shared_with")
+        fields = ("id", "name", "owner", "balance", "date_created", "incomes", "expenses", "shared_with")
 
     def get_incomes(self, obj):
         incomes = obj.record_set.filter(is_expense=False)

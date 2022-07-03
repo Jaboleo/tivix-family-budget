@@ -5,8 +5,8 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r"budgets", views.BudgetViewSet)
-router.register(r"records", views.RecordViewSet)
+router.register(r"budgets", views.BudgetViewSet, basename="Budgets")
+router.register(r"records", views.RecordViewSet, basename="Records")
 
 urlpatterns = [
     path("", include(router.urls)),

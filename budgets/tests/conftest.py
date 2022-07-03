@@ -16,20 +16,12 @@ def budget_payload():
 
 
 @pytest.fixture()
-def user_client(create_user):
-    client = APIClient()
-    client.force_authenticate(create_user)
-    return {
-        "client": client,
-        "user": create_user
-    }
-
-
-@pytest.fixture()
 def create_budget(create_user, budget_payload):
     client.force_authenticate(create_user)
     client.post("/budgets/budgets/", data=budget_payload)
-    return Budget.objects.get(name__exact=budget_payload["name"])
+    budget = Budget.objects.get(name__exact=budget_payload["name"])
+    yield budget
+    Budget.objects.all().delete()
 
 
 @pytest.fixture()

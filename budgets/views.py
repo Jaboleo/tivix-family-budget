@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, status, views, generics
+from rest_framework import viewsets, status, views, generics, filters
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -12,9 +12,18 @@ from family_budget.permissions import IsOwnerOrAdmin
 
 class BudgetViewSet(viewsets.ModelViewSet):
 
-    queryset = Budget.objects.all()
     serializer_class = BudgetSerializer
     pagination_class = BudgetsPagination
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['balance', 'date_created']
+
+    def get_queryset(self):
+        queryset = Budget.objects.all()
+        min_date = self.request.query_params.get('min_date')
+        max_date = self.request.query_params.get('max_date')
+        if any((min_date, max_date)):
+            queryset = queryset.filter(date_created__range=(min_date, max_date))
+        return queryset
 
     def get_permissions(self):
         if self.action in ["create", "list"]:
@@ -27,10 +36,10 @@ class BudgetViewSet(viewsets.ModelViewSet):
             return (AllowAny(),)
 
     def list(self, request):
-        data = self.queryset
-        if not request.user.is_staff:
-            data = self.queryset.filter(owner=request.user)
-        serializer = self.serializer_class(data, many=True)
+        queryset = self.get_queryset()
+        if not request.user.is_staff and queryset:
+            queryset = queryset.filter(owner=request.user)
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request):

@@ -19,15 +19,8 @@ def test_budget_create(create_user, budget_payload):
     assert Budget.objects.filter(name__exact=budget_payload["name"]).count() == 1
 
 
-def test_budget_create_unauthorized(budget_payload):
-    response = client.post("/budgets/budgets/", data=budget_payload)
-    content = json.loads(response.content)
-    assert response.status_code == 401
-    assert content["detail"] == "Authentication credentials were not provided."
-
-
-def test_budget_patch(user_client, create_budget):
-    client = user_client["client"]
+def test_budget_patch(create_user, create_budget):
+    client.force_authenticate(create_user)
     client.patch(f"/budgets/budgets/{create_budget.pk}/", data={"name": "new_name"})
     assert Budget.objects.filter(name="teast_name").count() == 0
     assert Budget.objects.filter(name="new_name").count() == 1
@@ -117,13 +110,3 @@ def test_budget_list_shared_with_user(create_user_2, create_and_share_budget):
     content = json.loads(response.content)
     assert response.status_code == 200
     assert len(content) == 1
-
-
-@pytest.mark.skip(reason="TODO")
-def test_budget_filter_by_date():
-    pass
-
-
-@pytest.mark.skip(reason="TODO")
-def test_budget_filter_by_balance():
-    pass

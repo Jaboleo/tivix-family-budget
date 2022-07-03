@@ -18,7 +18,7 @@ def test_user_create(user_payload, admin_user):
     assert User.objects.filter(username__exact=user_payload["username"]).count() == 1
 
 
-def test_user_delete(create_user, admin_user, user_payload):
+def test_user_delete(create_user, admin_user):
     client.force_authenticate(admin_user)
     response = client.delete(f"/users/{create_user.pk}/")
     assert response.status_code == 200

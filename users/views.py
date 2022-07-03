@@ -19,6 +19,7 @@ class UserViewSet(ModelViewSet):
             return (IsThisUserOrAdmin(),)
         return (AllowAny(),)
 
+    # pylint: disable=arguments-differ
     def destroy(self, request, pk=None):
         user_to_delete = User.objects.get(pk=pk)
         self.check_object_permissions(self.request, user_to_delete)

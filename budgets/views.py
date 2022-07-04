@@ -26,14 +26,13 @@ class BudgetViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.action in ["create", "list"]:
-            return (IsAuthenticated(),)
+        if self.action in ["list"]:
+            return (IsAuthenticated(), )
+
         if self.action in ["destroy", "update", "partial_update"]:
-            return (
-                IsOwnerOrAdmin(),
-            )
-        else:
-            return (AllowAny(),)
+            return (IsOwnerOrAdmin(), )
+
+        return (AllowAny(),)
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -45,11 +44,12 @@ class BudgetViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         budget_serializer = self.serializer_class(data=data)
+
         if budget_serializer.is_valid():
             budget_serializer.save(owner=request.user)
             return Response(budget_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(budget_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(budget_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ShareBudget(generics.ListCreateAPIView):
@@ -113,8 +113,8 @@ class RecordViewSet(viewsets.ModelViewSet):
                 IsAuthenticated(),
                 IsOwnerOrAdmin(),
             )
-        else:
-            return (AllowAny(),)
+
+        return (AllowAny(),)
 
     def list(self, request):
         return Response("Cannot list incomes/expenses outside budgets", status=status.HTTP_403_FORBIDDEN)
@@ -122,14 +122,15 @@ class RecordViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = request.data
         record_serializer = self.serializer_class(data=data)
+
         if record_serializer.is_valid():
             budget = Budget.objects.get(pk=data["budget"])
             if not request.user == budget.owner:
                 return Response("You cant only add record the the budgets you own", status=status.HTTP_403_FORBIDDEN)
             record_serializer.save(budget=budget)
             return Response(record_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(record_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(record_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk):
         record = get_object_or_404(Record, pk=pk)

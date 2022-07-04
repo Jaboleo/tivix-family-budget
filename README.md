@@ -43,7 +43,7 @@ Since this is a Django app, there're several steps that are needed to run it loc
    ```
 6. Run the application:
    ```
-   python manage.py runserver
+   python3 manage.py runserver
    ```
 7. Open your browser on http://localhost:8000/
 

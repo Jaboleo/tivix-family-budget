@@ -5,12 +5,12 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r"budgets", views.BudgetViewSet, basename="Budgets")
-router.register(r"records", views.RecordViewSet, basename="Records")
+router.register(r"budgets", views.BudgetViewSet, basename="budgets")
+router.register(r"records", views.RecordViewSet, basename="records")
 
 urlpatterns = [
     path("", include(router.urls)),
     path("share/", views.ShareBudget.as_view(), name="share_budget"),
     path("unshare/", views.UnShareBudget.as_view(), name="unshare_budget"),
-    path("shared-with-me/", views.SharedWithMe.as_view(), name="shared_with_me"),
+    path("shared/", views.SharedWithMe.as_view(), name="shared"),
 ]
